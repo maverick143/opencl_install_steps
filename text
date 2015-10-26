@@ -1,0 +1,61 @@
+#!/bin/bash
+#UBUNTU-14.04 CUDA Installation and Verification
+sudo apt-get update -y && sudo apt-get install build-essential -y
+wget http://developer.download.nvidia.com/compute/cuda/7_0/Prod/local_installers/cuda_7.0.28_linux.run
+chmod +x cuda_7.0.28_linux.run
+sudo ./cuda_7.0.28_linux.run -extract=`pwd`/nvidia_installers
+cd nvidia_installers/
+sudo wget http://us.download.nvidia.com/XFree86/Linux-x86_64/346.82/NVIDIA-Linux-x86_64-346.82.run
+sudo chmod u+x NVIDIA-Linux-x86_64-346.82.run 
+sudo ./NVIDIA-Linux-x86_64-346.82.run
+sudo apt-get install linux-image-extra-virtual
+sudo reboot
+
+sudo sh -c 'echo "blacklist nouveau" >> /etc/modprobe.d/blacklist-nouveau.conf'
+sudo sh -c 'echo "blacklist lbm-nouveau" >> /etc/modprobe.d/blacklist-nouveau.conf'
+sudo sh -c 'echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nouveau.conf'
+sudo sh -c 'echo "alias nouveau off" >> /etc/modprobe.d/blacklist-nouveau.conf'
+sudo sh -c 'echo "alias lbm-nouveau off" >> /etc/modprobe.d/blacklist-nouveau.conf'
+
+echo options nouveau modeset=0 | sudo tee -a /etc/modprobe.d/nouveau-kms.conf
+sudo update-initramfs -u
+sudo reboot
+sudo apt-get install linux-source -y
+sudo apt-get install linux-headers-generic -y
+cd nvidia_installers
+sudo chmod u+x NVIDIA-Linux-x86_64-346.82.run 
+sudo ./NVIDIA-Linux-x86_64-346.82.run [-s -N --no-kernel-module]
+sudo modprobe nvidia
+sudo ./cuda-linux64-rel-7.0.28-19326674.run
+export PATH=$PATH:/usr/local/cuda-7.0/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-7.0/lib64
+echo "export PATH=\$PATH:/usr/local/cuda-7.0/bin" >> ~/.bashrc 
+echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/cuda-7.0/lib64" >> ~/.bashrc 
+echo "/usr/local/cuda-7.0/lib64" | sudo tee -a /etc/ld.so.conf
+sudo ldconfig
+
+#This part is optional .. for verification of the installation only
+sudo ./cuda-samples-linux-7.0.28-19326674.run
+cd /usr/local/cuda/samples/1_Utilities/deviceQuery
+sudo make
+./deviceQuery 
+
+
+#OPENCL Installation and Verification
+wget https://s3-us-west-2.amazonaws.com/bfinstall/opencl_runtime_15.1_x64_5.0.0.57.tgz
+tar -zxvf opencl_runtime_15.1_x64_5.0.0.57.tgz
+cd opencl_runtime_15.1_x64_5.0.0.57/
+perl -pi -e 's/ACCEPT_EULA=decline/ACCEPT_EULA=accept/g' silent.cfg
+perl -pi -e 's/INSTALL_MODE=RPM/INSTALL_MODE=NONRPM/g' silent.cfg
+sudo ./install.sh -s silent.cfg
+cd ../
+rm -f opencl_runtime_15.1_x64_5.0.0.57.tgz
+rm -rf opencl_runtime_15.1_x64_5.0.0.57
+sudo ln -s /opt/intel/opencl-1.2-5.0.0.57 /opt/intel/opencl
+wget https://s3-us-west-2.amazonaws.com/bfinstall/opencl_include_files.tar.gz
+tar -zxvf opencl_include_files.tar.gz
+sudo cp -r ./opencl_include_files/include /opt/intel/opencl/.
+rm -rf opencl_include_files
+rm -f opencl_include_files.tar.gz
+sudo perl -pi -e 's/libnvidia-opencl\.so\.1/\/usr\/lib\/x86_64-linux-gnu\/libnvidia-opencl\.so\.1/g' /etc/OpenCL/vendors/nvidia.icd
+sudo sh -c 'echo "/opt/intel/opencl-1.2-5.0.0.57/lib64/libintelocl.so" >> /etc/OpenCL/vendors/intel.icd'

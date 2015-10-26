@@ -1,0 +1,4 @@
+
+LD_LIBRARY_PATH=/etc/bitfusion OCLADAPTOR_CONFIG=/etc/bitfusion/adaptor.conf CYCLES_OPENCL_TEST=all ./blender-softwaregl
+
+
