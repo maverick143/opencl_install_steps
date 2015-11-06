@@ -1,4 +1,8 @@
 
+curl -u  't91chWUdp0NskQnulBPQHP67dytoYk0d:' -X POST -H 'Content-Type: application/json' -d "{ \"userId\": \"no_user_id\", \"event\": \"[fastr]ssh_bfenable\", \"properties\": {\"ip_address\": \"${PUBLIC_IP}\"}}" https://api.segment.io/v1/track
+
+curl -u  'EmlVwwz6NFjcmWNBgVfExFusqY3e6tJc:' -X POST -H 'Content-Type: application/json' -d "{ \"userId\": \"no_user_id\", \"event\": \"[fastr]ssh_bfenable\", \"properties\": {\"ip_address\": \"${PUBLIC_IP}\"}}" https://api.segment.io/v1/track
+
 LD_LIBRARY_PATH=/etc/bitfusion OCLADAPTOR_CONFIG=/etc/bitfusion/adaptor.conf CYCLES_OPENCL_TEST=all ./blender-softwaregl
 
 
