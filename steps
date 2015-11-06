@@ -1,3 +1,4 @@
+PUBLIC_IP="$(curl http://169.254.169.254/latest/meta-data/public-ipv4)"
 
 curl -u  't91chWUdp0NskQnulBPQHP67dytoYk0d:' -X POST -H 'Content-Type: application/json' -d "{ \"userId\": \"no_user_id\", \"event\": \"[fastr]ssh_bfenable\", \"properties\": {\"ip_address\": \"${PUBLIC_IP}\"}}" https://api.segment.io/v1/track
 
